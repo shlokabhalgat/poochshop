@@ -9,4 +9,4 @@ urlpatterns = [
     path('logout', views.logout),
     path('', include('django.contrib.auth.urls')),
     path('', include('social_django.urls')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
