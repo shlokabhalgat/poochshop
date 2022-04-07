@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 import django_heroku
+import mongoengine
+import pymongo
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-21iz8onpio-0pt#@qniy7m^j(kmcib6)t=0i9h*0ir!g@ha0!e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'False'
+DEBUG = 'TRUE'
 
-ALLOWED_HOSTS = ['http://127.0.0.1:8000/', 'poochshop.herokuapp.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -43,6 +45,10 @@ INSTALLED_APPS = [
     'poochshop_apps',
     'social_django',
     'django_typeform.apps.DjangoTypeformConfig',
+    'rest_framework_mongoengine',
+    'graphene',
+    'graphene_mongo',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -82,16 +88,13 @@ WSGI_APPLICATION = 'poochshop.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'customers',
-        'USER': 'shloka',
-        'PASSWORD': 'momo',
+      'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'pet_form_django',
+        'HOST': 'localhost',
+        'PORT': '27017'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -129,25 +132,16 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-# STATIC_ROOT  = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
+
 # STATIC_URL = '/static/'
-#
-# # Extra lookup directories for collectstatic to find static files
-# STATICFILES_DIRS = (
-#     os.path.join(PROJECT_ROOT, 'static'),
-# )
-
-# STATIC_URL = 'static/'
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
-# STATICFILES_DIRS = (
-#     os.path.join(BASE_DIR, "static"),
-# )
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -174,7 +168,24 @@ AUTHENTICATION_BACKENDS = {
     'django.contrib.auth.backends.ModelBackend'
 }
 LOGIN_URL = '/login/auth0'
-LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_REDIRECT_URL = '/petform'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+_MONGODB_USER = ""
+_MONGODB_PASSWD = ""
+_MONGODB_HOST = "localhost"
+_MONGODB_NAME = 'pet_form_django'
+_MONGODB_PORT = 27017
+_MONGODB_DATABASE_HOST = "mongodb://%s:%s@%s/%s" % (
+    _MONGODB_USER,
+    _MONGODB_PASSWD,
+    _MONGODB_HOST,
+    _MONGODB_NAME,
+)
+
+mongoengine.connect(_MONGODB_NAME, host=_MONGODB_HOST, port=_MONGODB_PORT)
+
+GRAPHENE = {"SCHEMA": "poochshop_apps.schema.schema"}  # Where your Graphene schema lives
+
