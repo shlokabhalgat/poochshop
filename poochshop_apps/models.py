@@ -33,13 +33,14 @@ SERVICE_CHOICES = [
 
 class PetFormData(models.Model):
     abstract = True
+    index = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     breed = models.CharField(max_length=100)
     amount_spent = models.CharField(max_length=100, choices=AMOUNT_CHOICES)
     pincode = models.CharField(max_length=15)
     services_required = models.CharField(max_length=100, choices=SERVICE_CHOICES)
-    auth_user_email = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True,unique=True)
+    auth_user_email = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class VendorData(Document):
@@ -62,28 +63,27 @@ class VendorData(Document):
 
 class MongoPetData(Document):
     meta = {'collection': 'poochshop_apps_petformdata'}
-    ID = IntField()
-    id = IntField()
+    index = IntField()
     name = StringField()
     age = IntField()
     breed = StringField()
     amount_spent = StringField()
     pincode = StringField()
     services_required = StringField()
-    auth_user_email_id = IntField(primary_key=True)
+    auth_user_email_id = IntField()
 
 
-class AuthUser(Document):
-    meta = {'collection': 'auth_user'}
-    _id = IntField()
-    id = IntField()
-    password = StringField()
-    last_login = DateField()
-    is_superuser = BooleanField()
-    username = StringField()
-    first_name = StringField()
-    last_name = StringField()
-    email = StringField()
-    is_staff = BooleanField()
-    is_active = BooleanField()
-    dat_joined = DateField()
+# class AuthUser(Document):
+#     meta = {'collection': 'auth_user'}
+#     _id = IntField()
+#     id = IntField()
+#     password = StringField()
+#     last_login = DateField()
+#     is_superuser = BooleanField()
+#     username = StringField()
+#     first_name = StringField()
+#     last_name = StringField()
+#     email = StringField()
+#     is_staff = BooleanField()
+#     is_active = BooleanField()
+#     dat_joined = DateField()

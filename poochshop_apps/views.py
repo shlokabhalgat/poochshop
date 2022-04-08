@@ -6,7 +6,7 @@ from django.contrib.auth import logout as log_out
 from django.conf import settings
 from django.http import HttpResponseRedirect, HttpResponse
 from urllib.parse import urlencode
-import poochshop_apps.batteries
+from poochshop_apps import batteries
 from .forms import PetForm, UpdatePetForm
 from .models import PetFormData, VendorData, MongoPetData
 from poochshop_apps import schema
@@ -25,14 +25,7 @@ def index(request):
 
 @login_required
 def dashboard(request):
-    user = request.user
-    auth0user = user.social_auth.get(provider='auth0')
-    userdata = {
-        'user_id': auth0user.uid,
-        'name': user.first_name,
-        'picture': auth0user.extra_data['picture'],
-        'email': auth0user.extra_data['email'],
-    }
+    auth0user, userdata = batteries.requestAuthUserData(request)
     form_deats = PetFormData.objects.filter(auth_user_email=request.user).values_list('pincode', 'name', 'breed', 'age')
     pet_form_values = form_deats.values()
     value_iterator = iter(pet_form_values)
@@ -40,10 +33,6 @@ def dashboard(request):
     if PetFormData.objects.filter(auth_user_email=request.user):
         vendor_pincode = first_value.get("pincode")
     print(vendor_pincode)
-    print("Auth0user", auth0user)
-    print("Request.user", request.user)
-    print("USER", user)
-    # client = GraphqlClient(endpoint="http://127.0.0.1:8000/graphql/")
     query = """
             query ($pincode: String)
             {
@@ -78,26 +67,8 @@ def dashboard(request):
                 name = item['VendorName']
                 new_dict[name] = item
             print(new_dict)
-            # for dictionary in query_vendors_list:
-            #     try:
-            # v_nm = dictionary['VendorName']
-            # print(v_nm)
-            # print(v_socials)
-            # print(v_booking)
-            # print(v_ph)
-            # print(v_email)
-            # print(v_add)
-            # print(v_pin)
-            # print(v_city)
-            # print(v_charges)
-            # except KeyError:
-            #     pass
         else:
             raise Exception(f"Query failed to run with a {r.status_code}.")
-        # data = client.execute(query=query, variables=variables)
-        # print(data)
-        # print("req.user", user)  bshloks
-        # print(userdata)
         nm = first_value.get("name")
         print(nm)
         breed = first_value.get("breed")
@@ -130,14 +101,7 @@ def showformdata(request):
     # session_data = session.get_decoded()
     # user = User.objects.get(id=uid)
     form = PetForm(request.POST)
-    user = request.user
-    auth0user = user.social_auth.get(provider='auth0')
-    userdata = {
-        'user_id': auth0user.uid,
-        'name': user.first_name,
-        'picture': auth0user.extra_data['picture'],
-        'email': auth0user.extra_data['email'],
-    }
+    auth0user, userdata = batteries.requestAuthUserData(request)
     if PetFormData.objects.filter(auth_user_email=request.user).exists():
         # print(session_data)
         return redirect('/dashboard')
@@ -164,33 +128,12 @@ def showformdata(request):
                        })
 
 
-def returnAuthEmailID(request):
-    data = returnPetName(request)
-    pet_name = data['pet_name']
-    all_objs = MongoPetData.objects.all()
-    for obj in all_objs:
-        if obj.name == pet_name:
-            mid = obj.auth_user_email_id
-    return mid
-
-
-def returnPetName(request):
-    form_deats = PetFormData.objects.filter(auth_user_email=request.user).values_list('pincode', 'name', 'breed', 'age')
-    pet_form_values = form_deats.values()
-    value_iterator = iter(pet_form_values)
-    first_value = next(value_iterator)
-    if PetFormData.objects.filter(auth_user_email=request.user):
-        pet_name = first_value.get("name")
-        pet_age = first_value.get("age")
-        pet_breed = first_value.get("breed")
-        pet_pincode = first_value.get("pincode")
-    return {'pet_name':pet_name, 'pet_age':pet_age,'pet_breed':pet_breed, 'pet_pincode': pet_pincode}
-
 @login_required
 def updateprofile(request):
+    auth0user, userdata = batteries.requestAuthUserData(request)
     form = UpdatePetForm(request.POST)
-    mid = returnAuthEmailID(request)
-    data = returnPetName(request)
+    mid = batteries.returnAuthEmailID(request)
+    data = batteries.returnPetName(request)
     if request.method == 'POST':
         if form.is_valid():
             if request.user.is_authenticated:
@@ -217,20 +160,18 @@ def updateprofile(request):
                 print(breed)
                 print(pincode)
                 print(mid)
-                # client = GraphqlClient(endpoint="http://127.0.0.1:8000/graphql/")
-                # data = client.execute(query=query, variables=variables)
-                # print(data)
                 endpoint = "http://127.0.0.1:8000/graphql/"
                 variables = {"mid": mid, "name": nm, "age": age, "breed": breed, "pincode": pincode}
                 query = """
                          mutation($mid: Int!, $name: String, $age: Int, $breed: String, $pincode: String){
                              updateProfile(mid:$mid,name:$name,age:$age,breed:$breed,pincode:$pincode){
                                 petform{
+                                  index
                                     name
                                     age
                                     breed
-                                    Id
-                                    authUserEmailId
+                                  pincode
+                                  authUserEmailId
                                 }
                             }
                         }
@@ -239,10 +180,13 @@ def updateprofile(request):
                 if r.status_code == 200:
                     res = json.dumps(r.json(), indent=2)
                     print(res)
+                    return redirect('/dashboard')
                 else:
                     raise Exception(f"Query failed to run with a {r.status_code}.")
-
+                # client = GraphqlClient(endpoint="http://127.0.0.1:8000/graphql/")
+                # data = client.execute(query=query, variables=variables)
+                # print(data)
     else:
         form = UpdatePetForm()
-
-    return render(request, 'updateprofile.html', {'form': form})
+    return render(request, 'updateprofile.html',
+                  {'form': form, 'auth0User': auth0user, 'userdata': json.dumps(userdata, indent=4)})
