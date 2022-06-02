@@ -50,16 +50,16 @@
         </div>
     </div>
 </div>
-<div class="container">
-    Welcome {{ user.get_username }}
-<form action="" method="POST" novalidate>
-    {% csrf_token %}
-  <table>
-    {{ form }}
-</table>
-    <input type="submit" value="Submit">
-    {{ form.errors }}
-</form>
+<div class="row offset-lg-1 offset-md-1 offset-1 col-lg-6 col-md-6 col-6 welcome-name">Welcome, {{ user.get_username }}</div>
+<div class="offset-lg-2 col-lg-6 col-sm-6 col-6 border rounded">
+    <form class="form-section" action="" method="POST" novalidate>
+        {% csrf_token %}
+        <table>
+        {{ form }}
+        </table>
+        <input type="submit" value="Submit">
+        {{ form.errors }}
+    </form>
 </div>
 <script src="{% static 'js/main.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>

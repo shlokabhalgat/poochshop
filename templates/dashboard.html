@@ -49,11 +49,11 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-2">
-            <div class="card text-center">
+        <div class="col-md-3">
+            <div class="card text-center" id="pet_profile">
                 <img src="https://images.dog.ceo/breeds/cockapoo/george-close-up.jpeg   "
                      width="240" height="240" class=" rectangle mx-auto d-block" id="pet_profile_picture">
-                <div class="card-body" id="pet_profile">
+                <div class="card-body" >
                     {% for pet_detail in form_details  %}
                     <p>{{pet_detail}} </p>
                     {% endfor %}
@@ -63,7 +63,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-10">
+        <div class="col-md-9">
             <div class="card mb-4">
                 <div class="table-responsive">
                     <div class="card-body">
@@ -86,6 +86,7 @@
                                         <td>{{ v.City }}</td>
                                         <td>{{ v.Address }}</td>
                                         <td>{{ v.Socials }}</td>
+                                        <td><a href="#">Book Now</a> </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

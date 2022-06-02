@@ -3,13 +3,13 @@
 /* Please ❤ this if you like it! */
 
 
-@import url('https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&subset=devanagari,latin-ext');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap');
 
 /* #Primary
 ================================================== */
 
 body{
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
 	font-size: 16px;
 	line-height: 24px;
 	font-weight: 400;
@@ -182,8 +182,18 @@ display: block;
 }
 #pet_profile h4{
     color: #8167a9;
-    font-family: 'Poppins', sans-serif;
 }
 #pet_profile h5{
     padding: 10px;
+}
+
+.form-section{
+    padding: 13px;
+    font-family:'Nunito','sans-serif';
+
+}
+.welcome-name{
+    font-family:'Nunito','sans-serif';
+    font-size: xx-large;
+    font-weight: bold;
 }

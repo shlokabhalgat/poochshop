@@ -1,4 +1,5 @@
-from .models import PetFormData, VendorData,MongoPetData
+from .models import PetFormData, VendorData, MongoPetData
+
 
 def requestAuthUserData(request):
     user = request.user
@@ -9,7 +10,7 @@ def requestAuthUserData(request):
         'picture': auth0user.extra_data['picture'],
         'email': auth0user.extra_data['email'],
     }
-    return auth0user,userdata
+    return auth0user, userdata
 
 
 def returnAuthEmailID(request):
@@ -32,6 +33,4 @@ def returnPetName(request):
         pet_age = first_value.get("age")
         pet_breed = first_value.get("breed")
         pet_pincode = first_value.get("pincode")
-    return {'pet_name':pet_name, 'pet_age':pet_age,'pet_breed':pet_breed, 'pet_pincode': pet_pincode}
-
-
+    return {'pet_name': pet_name, 'pet_age': pet_age, 'pet_breed': pet_breed, 'pet_pincode': pet_pincode}
